@@ -827,50 +827,52 @@ function HomePage({ navigate }) {
   return (
     <section className="landing-grid">
       <article className="feature-card hero-feature">
-        <p className="feature-kicker">Blog</p>
-        <h1>Blog</h1>
-        <p className="feature-text">
-          Notes, interesting finds, and lessons learned during my engineering journey.
-        </p>
-        <div className="blog-preview-filters">
-          <button
-            className={!selectedFilter ? "active" : ""}
-            onClick={() => setSelectedFilter(null)}
-            type="button"
-          >
-            All
-          </button>
-          {homeBlogFilters.map((filter) => (
+        <div className="hero-feature-body">
+          <p className="feature-kicker">Blog</p>
+          <h1>Blog</h1>
+          <p className="feature-text">
+            Notes, interesting finds, and lessons learned during my engineering journey.
+          </p>
+          <div className="blog-preview-filters">
             <button
-              className={selectedFilter === filter.tag ? "active" : ""}
-              key={filter.tag}
-              onClick={() => setSelectedFilter(filter.tag)}
+              className={!selectedFilter ? "active" : ""}
+              onClick={() => setSelectedFilter(null)}
               type="button"
             >
-              {filter.label}
+              All
             </button>
-          ))}
-        </div>
-        <div className="blog-preview-list">
-          {previewEntries.length > 0 ? (
-            previewEntries.map((entry) => (
+            {homeBlogFilters.map((filter) => (
               <button
-                className="blog-preview-card"
-                key={entry.slug}
-                onClick={() => navigate("article", "push", entry.slug)}
+                className={selectedFilter === filter.tag ? "active" : ""}
+                key={filter.tag}
+                onClick={() => setSelectedFilter(filter.tag)}
                 type="button"
               >
-                <div className="blog-preview-meta">
-                  <span>{entry.date}</span>
-                  <span>{entry.readTime}</span>
-                </div>
-                <h3>{entry.title}</h3>
-                <p>{entry.summary}</p>
+                {filter.label}
               </button>
-            ))
-          ) : (
-            <div className="blog-preview-empty">No entries found for this filter yet.</div>
-          )}
+            ))}
+          </div>
+          <div className="blog-preview-list">
+            {previewEntries.length > 0 ? (
+              previewEntries.map((entry) => (
+                <button
+                  className="blog-preview-card"
+                  key={entry.slug}
+                  onClick={() => navigate("article", "push", entry.slug)}
+                  type="button"
+                >
+                  <div className="blog-preview-meta">
+                    <span>{entry.date}</span>
+                    <span>{entry.readTime}</span>
+                  </div>
+                  <h3>{entry.title}</h3>
+                  <p>{entry.summary}</p>
+                </button>
+              ))
+            ) : (
+              <div className="blog-preview-empty">No entries found for this filter yet.</div>
+            )}
+          </div>
         </div>
         <div className="cta-row">
           <NavLink className="cta-primary" navigate={navigate} page="blog">

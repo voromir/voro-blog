@@ -446,7 +446,11 @@ button {
   min-height: 22rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+}
+
+.hero-feature-body {
+  display: grid;
+  align-content: start;
 }
 
 .compact-card {
