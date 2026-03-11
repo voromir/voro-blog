@@ -1,35 +1,441 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
+const markdownModules = import.meta.glob("../blog-articles/*.md", {
+  eager: true,
+  query: "?raw",
+  import: "default"
+});
 
 const paragraphs = [
-  "Todo comenzó en 2011, cuando en la casa de mis abuelos leí en el diario que se abría la carrera de Programación en la UTN de Resistencia, Chaco. No fue una etapa sencilla: mientras estudiaba, trabajaba para sostener los gastos de una carrera arancelada que prometía ser “el futuro”.",
-  "En ese camino conocí a Rodrigo Miro, con quien compartía la pasión por el desarrollo de videojuegos. Nos encontramos en un taller de Java y, gracias a su invitación a sumarme a un emprendimiento que iniciaba con amigos, di mis primeros pasos profesionales y me incorporé a Tecspro (antes Mi Web Simple). Aunque suene extraño, fue allí donde empezó mi desorden.",
-  "En esa empresa trabajaba Gonzalo Alonso junto a varios miembros de Tecspro. Con él inicié una sana competencia de crecimiento profesional: fue mi referente, mi maestro y, con el tiempo, también mi némesis. Durante años percibí cierta incomodidad frente a mi evolución, pequeñas trabas que recién comprendería mucho después.",
-  "Tras dos años en Tecspro ingresé al Consejo Profesional de Ciencias Económicas, mi primera experiencia en relación de dependencia. Permanecí allí ocho años. Cuando Gonzalo renunció, quedé a cargo del área, formé equipos y acompañé el crecimiento de varias personas. Hasta hoy me arrepiento profundamente de haberme ido; es una de esas decisiones que enseñan, pero dejan una marca difícil de borrar.",
-  "Dejé el Consejo para asumir un puesto de gran relevancia en Crombie. Sin embargo, tras un año me encontré con un fuerte desorden estructural y una conducción excesivamente influenciada por Recursos Humanos y uno de los socios. No tenía conflictos personales, pero comencé a notar diferencias y ciertas trabas, similares a experiencias pasadas, aunque esta vez a nivel organizacional.",
-  "Decidí investigar y descubrí que utilizaban evaluaciones actitudinales para condicionar la performance, limitar el crecimiento y ajustar métricas internas. Lo comprobé por mi cuenta: contraté la versión profesional de la misma herramienta, respondí los exámenes con idénticas respuestas y obtuve una calificación de 9, mientras internamente me habían evaluado con un 6. Tuvimos varias reuniones, pero no alcanzamos un acuerdo. Según su visión, yo no encajaba con la misión y los valores de la empresa. Entonces decidí cerrar esa etapa.",
-  "Poco después llegué a la empresa que creí, con todo el corazón, que era el lugar que siempre había buscado. Gracias a Fernando Bugliot, ex CEO de Ceibus, arribé de manera indirecta a Pronto Pago. Allí viví casi tres años de crecimiento exponencial.",
-  "Todo cambió con la incorporación de Exequiel Ledezma. Trabajábamos junto a Felipe Azcoaga, colega y amigo a quien yo mismo había acompañado primero en el Consejo y luego en Ceibus. Durante un sprint surgió un conflicto por incumplimiento de plazos; desde mi perspectiva, no se debía a falta de compromiso de nuestra parte, sino a desorganización en la conducción técnica.",
-  "Tuvimos una reunión con Fernando, tensa pero necesaria, donde presenté evidencias y, en apariencia, la situación se resolvió a nuestro favor. Sin embargo, aquello no fue bien recibido. Aún conservo mensajes en los que se me reprochaba haber hablado directamente con dirección, exigiéndome que nunca más “pasara por encima” del liderazgo técnico.",
-  "En medio de todo esto formé una familia, me junté, alquilé un departamento y comenzó a construir mi propia casa. Algo hice bien.",
-  "Nunca había tenido conflictos personales; siempre prioricé el trabajo, la transparencia y resultados realistas. Más adelante mantuvimos otra reunión entre todos y acordamos dejar atrás el episodio. Dejé claro que mi única intención era cuidar mi trabajo, el de Felipe y el de la empresa, no generar enemistades. Pero la venganza llegaría tiempo después.",
-  "Meses después de asumir la gerencia general de Pronto Pago, Fernando renunció tanto a la empresa como a Ceibus. Su salida dejó un vacío importante, y yo presentí que mis días allí estaban contados. Cuatro meses más tarde, Exequiel me desvinculó.",
-  "Dejé el departamento y parte de la vida que venía en pleno crecimiento. Me instalé en mi casa, que logré terminar con mis ahorros, y abrí un kiosco de barrio.",
-  "Las experiencias que siguieron no tuvieron gran relevancia en mi desarrollo profesional: en su mayoría fueron trabajos como contractor, enfocados en features más que en crecimiento real. Sin embargo, las últimas dos impactaron fuertemente en mi salud.",
-  "La anteúltima fue WeTak. Llegué nuevamente por contacto con antiguos colegas de Tecspro para cubrir la salida de Fabián. La empresa tenía sus luces y sombras, incluso ciertas similitudes con Crombie. Esta vez mi relación con Gonzalo no fue buena, lo que limitó mi aporte real y puso en juego mi vínculo con el CEO, mi reputación y mi confianza profesional.",
-  "Finalmente, decidí renunciar para quedarme con una propuesta en Galicia, mi segunda experiencia en relación de dependencia, aunque esta vez a través de una consultora: OneInfo Consulting. Aposté por estabilidad y proyección. Sin embargo, a los seis meses fui despedido bajo el argumento de estar en “período de prueba”. Nunca hubo señales claras ni transparencia desde el inicio; de haberlas tenido, no habría tomado decisiones anteriores, porque tuve la oportunidad de elegir.",
-  "Desde entonces no logré reinsertarme laboralmente en medio de la burbuja de la IA. Intenté varios proyectos personales y, hasta ahora, lo único que realmente me sostiene es un sistema market que desarrollé para administrar mi propio kiosco. Gracias a él estoy sobreviviendo desde hace meses, y es a lo que hoy pienso dedicarle tiempo completo.",
-  "Mientras atravesaba todo este proceso, siempre estuvo a mi lado mi fiel amigo Martín, mi conejo. Me propuse darle todo lo que estuviera a mi alcance, todo lo que merecía, y estoy convencido de que lo hice, hasta hoy. Hoy tuve que tomar una decisión devastadora: destinar el dinero que me quedaba a los estudios de mi hija o llevarlo al veterinario, sabiendo que no podía postergarlo más. Y lo perdí.",
-  "Siento que fallé. Siento que, en algún punto, tomé decisiones equivocadas. Que tal vez, en lugar de seguir intentando reinsertarme en el rubro, debería haber salido a hacer Uber o cualquier otra cosa para no tener que elegir.",
-  "Sé que muchos dirán: “es solo una mascota”. Pero no se trata de eso. Se trata de los compromisos que uno asume en la vida. De la palabra silenciosa que uno se da a sí mismo cuando promete cuidar, sostener y estar.",
-  "Hoy siento que fallé en eso. Que me estoy fallando. Que, de alguna manera, también les estoy fallando a quienes dependen de mí.",
-  "Por eso tomo esta decisión. Renuncio a algo que amaba, no desde el rencor, sino desde la responsabilidad. Para reconstruirme. Para construir algo mejor.",
-  "Y si algún día me vuelven a encontrar, será en otro puesto, desde otra perspectiva, con otra iniciativa."
+  "It all began in 2011, when at my grandparents' house I read in the newspaper that the Programming degree was opening at UTN in Resistencia, Chaco. It was not an easy stage: while I was studying, I was also working to cover the costs of a paid degree that promised to be 'the future.'",
+  "Along that path I met Rodrigo Miro, who shared my passion for video game development. We met at a Java workshop and, thanks to his invitation to join a venture he was starting with friends, I took my first professional steps and joined Tecspro, formerly Mi Web Simple. As strange as it may sound, that was where my disorder began.",
+  "At that company Gonzalo Alonso worked alongside several members of Tecspro. With him I began a healthy competition for professional growth: he was my reference point, my teacher, and over time also my nemesis. For years I sensed a certain discomfort with my progress, small obstacles I would only fully understand much later.",
+  "After two years at Tecspro I joined the Professional Council of Economic Sciences, my first experience as a salaried employee. I stayed there for eight years. When Gonzalo resigned, I took charge of the area, built teams, and supported the growth of several people. To this day I deeply regret leaving; it is one of those decisions that teaches you something, but leaves a mark that is hard to erase.",
+  "I left the Council to take on a highly relevant role at Crombie. However, after a year I found a deeply disorganized structure and leadership that was excessively influenced by Human Resources and one of the partners. I had no personal conflicts, but I began noticing differences and obstacles similar to past experiences, though this time at an organizational level.",
+  "I decided to investigate and discovered that they were using attitudinal evaluations to condition performance, limit growth, and adjust internal metrics. I verified it myself: I paid for the professional version of the same tool, answered the tests with identical responses, and got a score of 9, while internally I had been evaluated with a 6. We had several meetings, but we never reached an agreement. In their view, I did not fit the company's mission and values. So I decided to close that chapter.",
+  "Soon after, I arrived at the company I believed, with all my heart, was the place I had always been looking for. Thanks to Fernando Bugliot, former CEO of Ceibus, I arrived indirectly at Pronto Pago. There I experienced almost three years of exponential growth.",
+  "Everything changed with the arrival of Exequiel Ledezma. I was working together with Felipe Azcoaga, a colleague and friend whom I had first supported at the Council and later at Ceibus. During a sprint, a conflict arose over missed deadlines; from my perspective, it was not due to a lack of commitment on our side, but to disorganization in the technical leadership.",
+  "We had a tense but necessary meeting with Fernando, where I presented evidence and, apparently, the situation was resolved in our favor. However, that was not well received. I still have messages in which I was criticized for speaking directly with leadership and told never again to 'go over' the technical leadership.",
+  "In the middle of all this I started a family, moved in with my partner, rented an apartment, and began building my own house. I must have done something right.",
+  "I had never had personal conflicts; I always prioritized work, transparency, and realistic outcomes. Later we had another meeting with everyone and agreed to put the episode behind us. I made it clear that my only intention was to protect my work, Felipe's work, and the company's interests, not to create enemies. But revenge would come later.",
+  "Months after taking over as general manager of Pronto Pago, Fernando resigned from both the company and Ceibus. His departure left an important void, and I sensed my days there were numbered. Four months later, Exequiel terminated my contract.",
+  "I left the apartment and part of the life that had been growing steadily. I moved into my house, which I had managed to finish with my savings, and opened a neighborhood kiosk.",
+  "The experiences that followed were not particularly relevant to my professional development: most of them were contractor roles focused on features rather than real growth. However, the last two had a major impact on my health.",
+  "The second to last was WeTak. I arrived again through contact with former Tecspro colleagues to cover Fabián's departure. The company had its lights and shadows, even some similarities with Crombie. This time my relationship with Gonzalo was not good, which limited my real contribution and put my relationship with the CEO, my reputation, and my professional confidence at risk.",
+  "Finally, I decided to resign to stay with an opportunity at Galicia, my second experience as a salaried employee, though this time through a consultancy: OneInfo Consulting. I was betting on stability and projection. However, after six months I was dismissed under the argument of being in a 'trial period.' There had never been clear signs or transparency from the beginning; had there been, I would not have made previous decisions, because I had the chance to choose.",
+  "Since then I have not managed to re-enter the job market in the middle of the AI bubble. I tried several personal projects and, so far, the only thing truly sustaining me is a market system I developed to manage my own kiosk. Thanks to it I have been surviving for months, and it is what I plan to dedicate my full time to now.",
+  "While going through all this, my loyal friend Martín, my rabbit, was always by my side. I set out to give him everything I could, everything he deserved, and I am convinced that I did, until today. Today I had to make a devastating decision: use the money I had left for my daughter's studies or take him to the vet, knowing I could not postpone it any longer. And I lost him.",
+  "I feel that I failed. I feel that, at some point, I made the wrong decisions. That maybe, instead of continuing to try to re-enter the industry, I should have gone out to drive Uber or do anything else so I would not have had to choose.",
+  "I know many people will say: 'it's just a pet.' But that is not what this is about. It is about the commitments one takes on in life. About the quiet promise you make to yourself when you commit to care, support, and be there.",
+  "Today I feel I failed at that. That I am failing myself. That, in some way, I am also failing those who depend on me.",
+  "That is why I make this decision. I am stepping away from something I loved, not out of resentment, but out of responsibility. To rebuild myself. To build something better.",
+  "And if someday you find me again, it will be in another role, from another perspective, with another initiative."
 ];
 
 const sectionBreaks = {
-  4: "Y desde allí, todo empezó a desbarrancarse.",
-  17: "Hoy es un día muy difícil para mí."
+  4: "And from there, everything started to fall apart.",
+  17: "Today is a very difficult day for me."
 };
+
+const blogEntry = {
+  slug: "my-story",
+  title: "My Story",
+  headline: "I have decided to stop programming…",
+  category: "Personal Chronicle",
+  summary:
+    "A personal chronicle about work, difficult decisions, and rebuilding a new stage.",
+  date: "27 Feb, 2026",
+  readTime: "15 min read"
+};
+
+const blogSections = [
+  "AI development",
+  "Frontend development",
+  "CLA tricks",
+];
+
+const projects = [
+  "Learn Russian Efficiently",
+  "Tenis Table Finder",
+  "Visualize your strava",
+  "Music Projects"
+];
+
+const certifications = [
+  "/Certificates/cert1.png",
+  "/Certificates/cert2.png",
+  "/Certificates/cert3.png",
+  "/Certificates/cert4.png",
+  "/Certificates/cert5.png"
+];
+
+const ocadoContributionSections = [
+  {
+    title: "Aligned Autonomy",
+    items: [
+      "Led the Java 21 migration rollout by helping prepare the new Docker image, piloting the first migration, and supporting the move of the remaining applications from Java 17.",
+      "Spotted the urgency of the ALDI migration before pipelines stopped working, investigated the path, migrated the first project, and helped the team complete the rest within a week.",
+      "Improved security posture by monitoring and remediating Snyk vulnerabilities, including difficult upgrades on React Router and the internationalization stack.",
+      "Created scripts, automation, and documentation to simplify translation pulls and merges while reducing duplication and team friction.",
+      "Improved error handling in Subscriptions UI and Receipts UI with better boundaries, better user feedback, and clearer failure management."
+    ]
+  },
+  {
+    title: "Learn Fast",
+    items: [
+      "Expanded beyond frontend by contributing to backend services and growing practical knowledge in Java, Spring Boot, and full system architecture.",
+      "Invested in continuous education across frontend, backend, and security through formal courses and specialized training.",
+      "Led technical discovery for Contentful-related work, quickly learning GraphQL, Contentful Apps, and dashboard tooling while delivering implementation, ADRs, testing, and documentation.",
+      "Conducted discovery for the Logged Out Delivery Pass Page, analysing frontend and backend needs and translating them into ADRs and delivery tickets.",
+      "Proactively learned theming and asset-update processes end to end, implemented production changes, and documented the process for future reuse."
+    ]
+  },
+  {
+    title: "Build Trust",
+    items: [
+      "Mentored engineers and managers joining the team, improved onboarding documentation, and supported internship onboarding across consecutive years.",
+      "Shared knowledge through presentations, demo sessions, lunch and learn talks, and practical documentation for multiple features and team processes.",
+      "Enabled the mobile team with onboarding materials, API documentation, delivery pass flows, demos, and ongoing support.",
+      "Actively helped resolve support tickets and provided technical guidance across frontend issues and broader system behavior."
+    ]
+  },
+  {
+    title: "Craft Smart",
+    items: [
+      "Improved observability by integrating Sentry alerts into Slack and expanding logging coverage so issues became visible much earlier.",
+      "Standardized Zod usage and validation to reduce duplicated types, improve data integrity, and move the frontend toward a fail-fast model."
+    ]
+  },
+  {
+    title: "Collective Potential",
+    items: [
+      "Worked closely with UX, Translation, and Tech Writing teams to deliver features, polish user-facing content, and improve release communication.",
+      "Collaborated with the frontend chapter to improve standards and maintainability, including SCSS Modules adoption and CODEOWNERS clarity.",
+      "Supported recruitment by helping with candidate assessment and CV selection.",
+      "Improved team delivery processes by documenting epic expectations and leading internal testing sessions with structured test cases and bug reporting resources."
+    ]
+  }
+];
+
+const ocadoContributionSummary =
+  "Delivery across migrations, security, translations, observability, mentoring, discovery, and process improvement during my time at Ocado.";
+
+const homeBlogFilters = [
+  { label: "AI development", tag: "AI" },
+  { label: "Frontend development", tag: "FE" },
+  { label: "CLA tricks", tag: "CLA" }
+];
+
+function formatDate(dateString) {
+  const date = new Date(`${dateString}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(date);
+}
+
+function estimateReadTime(text) {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return `${Math.max(1, Math.ceil(words / 220))} min read`;
+}
+
+function titleFromSlug(slug) {
+  return slug
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function parseFrontmatter(raw) {
+  if (!raw.startsWith("---")) {
+    return { attributes: {}, body: raw };
+  }
+
+  const end = raw.indexOf("\n---", 3);
+
+  if (end === -1) {
+    return { attributes: {}, body: raw };
+  }
+
+  const frontmatter = raw.slice(3, end).trim();
+  const body = raw.slice(end + 4).trim();
+  const attributes = {};
+
+  frontmatter.split("\n").forEach((line) => {
+    const separator = line.indexOf(":");
+
+    if (separator === -1) {
+      return;
+    }
+
+    const key = line.slice(0, separator).trim();
+    const value = line.slice(separator + 1).trim();
+    attributes[key] = parseFrontmatterValue(value);
+  });
+
+  return { attributes, body };
+}
+
+function parseFrontmatterValue(value) {
+  const trimmed = value.trim();
+
+  if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+    const inner = trimmed.slice(1, -1).trim();
+
+    if (!inner) {
+      return [];
+    }
+
+    return inner
+      .split(",")
+      .map((item) => item.trim().replace(/^["']|["']$/g, ""))
+      .filter(Boolean);
+  }
+
+  return trimmed.replace(/^["']|["']$/g, "");
+}
+
+function extractSummary(markdown) {
+  return (
+    markdown
+      .split(/\n\s*\n/)
+      .map((chunk) => chunk.trim())
+      .find(
+        (chunk) =>
+          chunk &&
+          !chunk.startsWith("#") &&
+          !chunk.startsWith(">") &&
+          !chunk.startsWith("```") &&
+          !chunk.startsWith("import ")
+      ) || "Markdown article."
+  );
+}
+
+function parseMarkdownBlocks(markdown) {
+  const lines = markdown.split("\n");
+  const blocks = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index];
+    const trimmed = line.trim();
+
+    if (!trimmed || trimmed.startsWith("import ") || trimmed.startsWith("export ")) {
+      index += 1;
+      continue;
+    }
+
+    if (trimmed.startsWith("```")) {
+      const language = trimmed.slice(3).trim();
+      const codeLines = [];
+      index += 1;
+
+      while (index < lines.length && !lines[index].trim().startsWith("```")) {
+        codeLines.push(lines[index]);
+        index += 1;
+      }
+
+      blocks.push({ type: "code", language, text: codeLines.join("\n") });
+      index += 1;
+      continue;
+    }
+
+    if (/^#{1,3}\s/.test(trimmed)) {
+      const level = trimmed.match(/^#+/)[0].length;
+      blocks.push({ type: "heading", level, text: trimmed.replace(/^#{1,3}\s/, "") });
+      index += 1;
+      continue;
+    }
+
+    if (/^>\s?/.test(trimmed)) {
+      const quoteLines = [];
+
+      while (index < lines.length && /^>\s?/.test(lines[index].trim())) {
+        quoteLines.push(lines[index].trim().replace(/^>\s?/, ""));
+        index += 1;
+      }
+
+      blocks.push({ type: "quote", text: quoteLines.join(" ") });
+      continue;
+    }
+
+    if (/^[-*]\s/.test(trimmed) || /^\d+\.\s/.test(trimmed)) {
+      const ordered = /^\d+\.\s/.test(trimmed);
+      const items = [];
+
+      while (
+        index < lines.length &&
+        (ordered ? /^\d+\.\s/.test(lines[index].trim()) : /^[-*]\s/.test(lines[index].trim()))
+      ) {
+        items.push(lines[index].trim().replace(ordered ? /^\d+\.\s/ : /^[-*]\s/, ""));
+        index += 1;
+      }
+
+      blocks.push({ type: "list", ordered, items });
+      continue;
+    }
+
+    const imageMatch = trimmed.match(/^!\[(.*)\]\((.*)\)$/);
+
+    if (imageMatch) {
+      blocks.push({ type: "image", alt: imageMatch[1], src: imageMatch[2] });
+      index += 1;
+      continue;
+    }
+
+    const paragraphLines = [];
+
+    while (
+      index < lines.length &&
+      lines[index].trim() &&
+      !/^#{1,3}\s/.test(lines[index].trim()) &&
+      !/^>\s?/.test(lines[index].trim()) &&
+      !/^[-*]\s/.test(lines[index].trim()) &&
+      !/^\d+\.\s/.test(lines[index].trim()) &&
+      !lines[index].trim().startsWith("```")
+    ) {
+      paragraphLines.push(lines[index].trim());
+      index += 1;
+    }
+
+    blocks.push({ type: "paragraph", text: paragraphLines.join(" ") });
+  }
+
+  return blocks;
+}
+
+function getMarkdownEntries() {
+  return Object.entries(markdownModules)
+    .map(([path, raw]) => {
+      const fileName = path.split("/").pop();
+      const fileStem = fileName.replace(/\.md$/, "");
+      const dateMatch = fileStem.match(/^(\d{4}-\d{2}-\d{2})-(.*)$/);
+      const isoDate = dateMatch ? dateMatch[1] : "1970-01-01";
+      const slug = dateMatch ? dateMatch[2] : fileStem;
+      const { attributes, body } = parseFrontmatter(raw);
+      const headingMatch = body.match(/^#\s+(.*)$/m);
+      const title = attributes.title || (headingMatch ? headingMatch[1].trim() : titleFromSlug(slug));
+      const summary = attributes.summary || extractSummary(body);
+
+      return {
+        slug,
+        title,
+        headline: title,
+        category: "Blog Entry",
+        summary,
+        isoDate,
+        date: formatDate(isoDate),
+        readTime: estimateReadTime(body),
+        author: "Dani Voro",
+        role: "Software Developer",
+        tags: Array.isArray(attributes.tags) ? attributes.tags : [],
+        blocks: parseMarkdownBlocks(body),
+        source: "markdown"
+      };
+    })
+    .sort((left, right) => right.isoDate.localeCompare(left.isoDate));
+}
+
+function buildStoryBlocks() {
+  const blocks = [{ type: "lead", text: "My tragic story" }];
+
+  paragraphs.forEach((paragraph, index) => {
+    if (sectionBreaks[index]) {
+      blocks.push({ type: "heading", level: 2, text: sectionBreaks[index] });
+    }
+
+    blocks.push({ type: "paragraph", text: paragraph });
+  });
+
+  blocks.push({
+    type: "note",
+    text: "This post will be deleted automatically on April 1st, 2026..."
+  });
+
+  return blocks;
+}
+
+const manualStoryEntry = {
+  ...blogEntry,
+  isoDate: "2026-02-27",
+  author: "Maximiliano Sh.",
+  role: "Developer",
+  tags: [],
+  blocks: buildStoryBlocks(),
+  source: "manual"
+};
+
+const blogEntries = [manualStoryEntry, ...getMarkdownEntries()].sort((left, right) =>
+  right.isoDate.localeCompare(left.isoDate)
+);
+
+function getArticleBySlug(slug) {
+  return blogEntries.find((entry) => entry.slug === slug) || null;
+}
+
+function getRouteFromHash(hashValue = window.location.hash) {
+  const hash = hashValue.replace(/^#/, "");
+
+  if (hash === "" || hash === "/" || hash === "inicio") {
+    return { page: "home" };
+  }
+
+  if (hash === "blog") {
+    return { page: "blog" };
+  }
+
+  if (hash === "about") {
+    return { page: "about" };
+  }
+
+  if (hash === "projects") {
+    return { page: "projects" };
+  }
+
+  if (hash === "about/ocado-contributions") {
+    return { page: "ocado-contributions" };
+  }
+
+  if (hash.startsWith("blog/")) {
+    return { page: "article", slug: decodeURIComponent(hash.slice(5)) };
+  }
+
+  return { page: "home" };
+}
+
+function getHashForPage(page, slug) {
+  if (page === "home") {
+    return "#inicio";
+  }
+
+  if (page === "blog") {
+    return "#blog";
+  }
+
+  if (page === "about") {
+    return "#about";
+  }
+
+  if (page === "projects") {
+    return "#projects";
+  }
+
+  if (page === "ocado-contributions") {
+    return "#about/ocado-contributions";
+  }
+
+  if (page === "article") {
+    return `#blog/${slug || blogEntry.slug}`;
+  }
+
+  return "#inicio";
+}
 
 function Icon({ children, className = "" }) {
   return (
@@ -48,142 +454,917 @@ function Icon({ children, className = "" }) {
   );
 }
 
-function App() {
-  const [theme, setTheme] = useState("dim");
+function CrumbLink({ href, children, current = false, onClick }) {
+  if (current) {
+    return <span className="current">{children}</span>;
+  }
 
   return (
-    <div className={`app theme-${theme}`}>
-      <main className="page">
-        <div className="topbar">
-          <nav aria-label="Breadcrumb" className="breadcrumbs">
-            <ul>
-              <li>
-                <a href="#inicio">
-                  <Icon className="icon-sm">
-                    <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
-                    <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  </Icon>
-                  Inicio
-                </a>
-              </li>
+    <a href={href} onClick={onClick}>
+      {children}
+    </a>
+  );
+}
+
+function Breadcrumbs({ route, navigate }) {
+  const items = [{ label: "Inicio", page: "home", icon: "home", current: route.page === "home" }];
+
+  if (route.page === "blog" || route.page === "article") {
+    items.push({ label: "Blog", page: "blog", icon: "news", current: route.page === "blog" });
+  }
+
+  if (route.page === "article") {
+    const currentArticle = getArticleBySlug(route.slug);
+    items.push({ label: currentArticle ? currentArticle.title : "Article", current: true });
+  }
+
+  if (route.page === "about") {
+    items.push({ label: "About Me", page: "about", icon: "user", current: true });
+  }
+
+  if (route.page === "ocado-contributions") {
+    items.push({ label: "About Me", page: "about", icon: "user", current: false });
+    items.push({ label: "Ocado contributions", page: "ocado-contributions", current: true });
+  }
+
+  if (route.page === "projects") {
+    items.push({ label: "Projects", page: "projects", icon: "wrench", current: true });
+  }
+
+  return (
+    <nav aria-label="Breadcrumb" className="breadcrumbs">
+      <ul>
+        {items.map((item, index) => (
+          <React.Fragment key={item.label}>
+            {index > 0 ? (
               <li className="separator">
                 <Icon className="icon-xs">
                   <path d="m9 18 6-6-6-6" />
                 </Icon>
               </li>
-              <li>
-                <span>
+            ) : null}
+            <li>
+              <CrumbLink
+                current={item.current}
+                href={getHashForPage(item.page)}
+                onClick={(event) => {
+                  if (item.current || !item.page) {
+                    return;
+                  }
+
+                  event.preventDefault();
+                  navigate(item.page);
+                }}
+              >
+                {item.icon === "home" ? (
+                  <Icon className="icon-sm">
+                    <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+                    <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  </Icon>
+                ) : null}
+                {item.icon === "news" ? (
                   <Icon className="icon-sm">
                     <path d="M15 18h-5" />
                     <path d="M18 14h-8" />
                     <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2" />
                     <rect height="4" rx="1" width="8" x="10" y="6" />
                   </Icon>
-                  Blog
-                </span>
-              </li>
-              <li className="separator">
-                <Icon className="icon-xs">
-                  <path d="m9 18 6-6-6-6" />
-                </Icon>
-              </li>
-              <li className="current">Mi historia</li>
-            </ul>
-          </nav>
+                ) : null}
+                {item.icon === "user" ? (
+                  <Icon className="icon-sm">
+                    <path d="M20 21a8 8 0 0 0-16 0" />
+                    <circle cx="12" cy="8" r="4" />
+                  </Icon>
+                ) : null}
+                {item.icon === "wrench" ? (
+                  <Icon className="icon-sm">
+                    <rect height="18" rx="2" width="18" x="3" y="3" />
+                    <path d="m8 9 3 3-3 3" />
+                    <path d="M13 15h3" />
+                  </Icon>
+                ) : null}
+                {childrenOrLabel(item)}
+              </CrumbLink>
+            </li>
+          </React.Fragment>
+        ))}
+      </ul>
+    </nav>
+  );
+}
 
-          <div className="theme-toggle">
+function childrenOrLabel(item) {
+  return item.label;
+}
+
+function ThemeToggle({ theme, setTheme }) {
+  return (
+    <div className="theme-toggle">
+      <button
+        aria-label={theme === "dim" ? "Switch to light theme" : "Switch to dark theme"}
+        aria-pressed={theme === "silk"}
+        className={`theme-slider ${theme === "silk" ? "light" : "dark"}`}
+        onClick={() => setTheme(theme === "dim" ? "silk" : "dim")}
+        type="button"
+      >
+        <span className="theme-slider-track">
+          <span className="theme-icon moon-icon">
+            <Icon className="icon-sm">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3c0 3 2 5.5 5 6.5 1.28.43 2.71.48 4.79.29" />
+            </Icon>
+          </span>
+          <span className="theme-icon sun-icon">
+            <Icon className="icon-sm">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2" />
+              <path d="M12 20v2" />
+              <path d="m4.93 4.93 1.41 1.41" />
+              <path d="m17.66 17.66 1.41 1.41" />
+              <path d="M2 12h2" />
+              <path d="M20 12h2" />
+              <path d="m6.34 17.66-1.41 1.41" />
+              <path d="m19.07 4.93-1.41 1.41" />
+            </Icon>
+          </span>
+          <span className="theme-thumb" />
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function ThemeControls({ theme, setTheme, uiStyle, setUiStyle }) {
+  const [open, setOpen] = useState(false);
+  const [terminalOpen, setTerminalOpen] = useState(false);
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    const onPointerDown = (event) => {
+      if (!panelRef.current || panelRef.current.contains(event.target)) {
+        return;
+      }
+
+      setOpen(false);
+    };
+
+    window.addEventListener("pointerdown", onPointerDown);
+    return () => window.removeEventListener("pointerdown", onPointerDown);
+  }, []);
+
+  return (
+    <div className="theme-controls" ref={panelRef}>
+      <ThemeToggle setTheme={setTheme} theme={theme} />
+      <div className="settings-panel-wrap">
+        <button
+          aria-expanded={open}
+          aria-label="Open theme settings"
+          className={`settings-button ${open ? "active" : ""}`}
+          onClick={() => {
+            setOpen((value) => !value);
+            setTerminalOpen(false);
+          }}
+          type="button"
+        >
+          <Icon className="icon-sm">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01A1.65 1.65 0 0 0 9.91 3H10a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </Icon>
+        </button>
+
+        {open ? (
+          <div className="settings-menu">
+            <p className="settings-title">Visual style</p>
             <button
-              className={theme === "dim" ? "active primary" : "outline"}
-              onClick={() => setTheme("dim")}
+              className={`settings-option ${uiStyle === "modern" ? "selected" : ""}`}
+              onClick={() => {
+                setUiStyle("modern");
+                setOpen(false);
+              }}
               type="button"
             >
-              Dark
+              <span>Modern</span>
+              <small>Current clean theme</small>
             </button>
             <button
-              className={theme === "silk" ? "active primary" : "outline"}
-              onClick={() => setTheme("silk")}
+              className={`settings-option ${uiStyle === "classic" ? "selected" : ""}`}
+              onClick={() => {
+                setUiStyle("classic");
+                setOpen(false);
+              }}
               type="button"
             >
-              Light
+              <span>Classic</span>
+              <small>Windows XP inspired</small>
             </button>
           </div>
+        ) : null}
+      </div>
+      <button
+        aria-expanded={terminalOpen}
+        aria-label="Open CV terminal instructions"
+        className={`settings-button ${terminalOpen ? "active" : ""}`}
+        onClick={() => {
+          setTerminalOpen((value) => !value);
+          setOpen(false);
+        }}
+        type="button"
+      >
+        <Icon className="icon-sm">
+          <rect height="18" rx="2" width="18" x="3" y="3" />
+          <path d="m8 9 3 3-3 3" />
+          <path d="M13 15h3" />
+        </Icon>
+      </button>
+      <aside className={`terminal-drawer ${terminalOpen ? "open" : ""}`}>
+        <div className="terminal-drawer-header">
+          <div>
+            <p className="settings-title">Terminal CV</p>
+            <h2>Get my CV from the terminal</h2>
+          </div>
+          <button
+            aria-label="Close CV terminal instructions"
+            className="settings-button"
+            onClick={() => setTerminalOpen(false)}
+            type="button"
+          >
+            <Icon className="icon-sm">
+              <path d="M6 6 18 18" />
+              <path d="M6 18 18 6" />
+            </Icon>
+          </button>
         </div>
+        <p className="feature-text terminal-copy">
+          Use the terminal to jump straight to the CV files from this project.
+        </p>
+        <div className="terminal-command-block">
+          <p className="terminal-command-label">Open the workspace</p>
+          <code>cd /Users/dani.vorobiev/bees/voro-blog</code>
+        </div>
+        <div className="terminal-command-block">
+          <p className="terminal-command-label">List likely CV assets</p>
+          <code>find . -iname '*cv*' -o -iname '*resume*'</code>
+        </div>
+        <div className="terminal-command-block">
+          <p className="terminal-command-label">Open the public folder</p>
+          <code>ls /Users/dani.vorobiev/bees/voro-blog/public</code>
+        </div>
+        <p className="terminal-hint">
+          If you want, I can also wire this panel to the real CV file path once
+          you tell me which file should be treated as the official one.
+        </p>
+      </aside>
+    </div>
+  );
+}
 
-        <article className="article-card">
-          <div className="article-inner">
-            <header className="article-header">
-              <div className="badge">Crónica Personal</div>
-              <h1>He decidido dejar de programar…</h1>
+function HeaderControls({
+  canGoBack,
+  canGoForward,
+  navigate,
+  onBack,
+  onForward,
+  route,
+  setTheme,
+  setUiStyle,
+  scrolled,
+  theme,
+  uiStyle
+}) {
+  return (
+    <div className={`topbar ${scrolled ? "topbar-scrolled" : ""}`}>
+      <div className="breadcrumb-row">
+        <HistoryNav
+          canGoBack={canGoBack}
+          canGoForward={canGoForward}
+          onBack={onBack}
+          onForward={onForward}
+        />
+        <Breadcrumbs navigate={navigate} route={route} />
+      </div>
+      <ThemeControls
+        setTheme={setTheme}
+        setUiStyle={setUiStyle}
+        theme={theme}
+        uiStyle={uiStyle}
+      />
+    </div>
+  );
+}
 
-              <div className="meta-row">
-                <div className="author">
-                  <div className="avatar-frame">
-                    <img alt="Author" src="/avatar.jpg" />
-                  </div>
-                  <div className="author-copy">
-                    <p className="author-name">Maximiliano Sh.</p>
-                    <p className="author-role">Desarrollador</p>
-                  </div>
+function HistoryNav({ canGoBack, canGoForward, onBack, onForward }) {
+  return (
+    <div className="history-nav" aria-label="Navigation history">
+      <button
+        aria-label="Go back"
+        className="history-button"
+        disabled={!canGoBack}
+        onClick={onBack}
+        type="button"
+      >
+        <Icon className="icon-sm">
+          <path d="m15 18-6-6 6-6" />
+        </Icon>
+      </button>
+      <button
+        aria-label="Go forward"
+        className="history-button"
+        disabled={!canGoForward}
+        onClick={onForward}
+        type="button"
+      >
+        <Icon className="icon-sm">
+          <path d="m9 18 6-6-6-6" />
+        </Icon>
+      </button>
+    </div>
+  );
+}
+
+function NavLink({ children, className, page, navigate, slug }) {
+  return (
+    <a
+      className={className}
+      href={getHashForPage(page, slug)}
+      onClick={(event) => {
+        event.preventDefault();
+        navigate(page, "push", slug);
+      }}
+    >
+      {children}
+    </a>
+  );
+}
+
+function HomePage({ navigate }) {
+  const [selectedFilter, setSelectedFilter] = useState(null);
+  const previewEntries = blogEntries
+    .filter((entry) => entry.source === "markdown")
+    .filter((entry) => !selectedFilter || entry.tags.some((tag) => tag.toUpperCase() === selectedFilter))
+    .slice(0, 3);
+
+  return (
+    <section className="landing-grid">
+      <article className="feature-card hero-feature">
+        <p className="feature-kicker">Blog</p>
+        <h1>Blog</h1>
+        <p className="feature-text">
+          Notes, interesting finds, and lessons learned during my engineering journey.
+        </p>
+        <div className="blog-preview-filters">
+          <button
+            className={!selectedFilter ? "active" : ""}
+            onClick={() => setSelectedFilter(null)}
+            type="button"
+          >
+            All
+          </button>
+          {homeBlogFilters.map((filter) => (
+            <button
+              className={selectedFilter === filter.tag ? "active" : ""}
+              key={filter.tag}
+              onClick={() => setSelectedFilter(filter.tag)}
+              type="button"
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+        <div className="blog-preview-list">
+          {previewEntries.length > 0 ? (
+            previewEntries.map((entry) => (
+              <button
+                className="blog-preview-card"
+                key={entry.slug}
+                onClick={() => navigate("article", "push", entry.slug)}
+                type="button"
+              >
+                <div className="blog-preview-meta">
+                  <span>{entry.date}</span>
+                  <span>{entry.readTime}</span>
                 </div>
+                <h3>{entry.title}</h3>
+                <p>{entry.summary}</p>
+              </button>
+            ))
+          ) : (
+            <div className="blog-preview-empty">No entries found for this filter yet.</div>
+          )}
+        </div>
+        <div className="cta-row">
+          <NavLink className="cta-primary" navigate={navigate} page="blog">
+            Go to blog
+          </NavLink>
+          <NavLink className="cta-secondary" navigate={navigate} page="about">
+            About me
+          </NavLink>
+        </div>
+      </article>
 
-                <div className="meta-list">
-                  <span>
-                    <Icon className="icon-sm primary-text">
-                      <path d="M8 2v4" />
-                      <path d="M16 2v4" />
-                      <rect height="18" rx="2" width="18" x="3" y="4" />
-                      <path d="M3 10h18" />
-                    </Icon>
-                    27 Feb, 2026
-                  </span>
-                  <span>
-                    <Icon className="icon-sm primary-text">
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 6v6l4 2" />
-                    </Icon>
-                    15 min de lectura
-                  </span>
-                </div>
-              </div>
-            </header>
+      <article className="feature-card compact-card">
+        <p className="feature-kicker">About Me</p>
+        <h2>Introduction</h2>
+        <p className="feature-text">
+          This section works as a quick access point to a short personal
+          introduction inside the site.
+        </p>
+        <NavLink className="text-link" navigate={navigate} page="about">
+          Open profile
+        </NavLink>
+      </article>
 
-            <div className="content">
-              <p className="intro">Mi trágica historia</p>
+      <article className="feature-card compact-card">
+        <p className="feature-kicker">Projects</p>
+        <h2>Projects</h2>
+        <p className="feature-text">
+          A selection of personal projects and experiments, organized on a
+          separate page.
+        </p>
+        <NavLink className="text-link" navigate={navigate} page="projects">
+          Open projects
+        </NavLink>
+      </article>
+    </section>
+  );
+}
 
-              {paragraphs.map((paragraph, index) => (
-                <React.Fragment key={`${index}-${paragraph.slice(0, 16)}`}>
-                  {sectionBreaks[index] ? <h2>{sectionBreaks[index]}</h2> : null}
-                  <p>{paragraph}</p>
-                </React.Fragment>
-              ))}
+function BlogPage({ navigate }) {
+  return (
+    <section className="list-card">
+      <div className="section-heading">
+        <p className="feature-kicker">Blog</p>
+        <h1>Entries</h1>
+        <p className="feature-text">
+          Every Markdown file placed in `blog-articles` is automatically added here.
+        </p>
+      </div>
 
-              <div className="expiration-note">
-                <span>
-                  Este post se va a eliminar automáticamente el 1ro de Abril del
-                  2026...
-                </span>
-              </div>
-            </div>
+      {blogEntries.map((entry) => (
+        <article className="post-row" key={entry.slug}>
+          <div>
+            <p className="post-category">{entry.category}</p>
+            <h2>{entry.title}</h2>
+            <p className="feature-text">{entry.summary}</p>
+          </div>
+          <div className="post-meta">
+            <span>{entry.date}</span>
+            <span>{entry.readTime}</span>
+            <NavLink
+              className="cta-primary"
+              navigate={navigate}
+              page="article"
+              slug={entry.slug}
+            >
+              Open
+            </NavLink>
           </div>
         </article>
+      ))}
+    </section>
+  );
+}
 
-        <footer className="footer">
-          <aside>
-            <div className="brand-block">
-              <Icon className="icon-brand primary-text">
-                <path d="M12 22v-9" />
-                <path d="M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.655 1.655 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z" />
-                <path d="M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13" />
-                <path d="M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.636 1.636 0 0 0 1.63 0z" />
-              </Icon>
-              <div>
-                <p className="brand-name">MaxShDev.</p>
-                <p>Desarrollador independiente.</p>
+function AboutPage({ navigate }) {
+  return (
+    <section className="list-card">
+      <div className="section-heading">
+        <p className="feature-kicker">About Me</p>
+        <h1>Dani Vorobiev</h1>
+      </div>
+
+      <div className="about-layout">
+        <div className="about-avatar">
+          <img alt="Dani Voro" src="/Voro-profile.png" />
+        </div>
+        <div className="about-copy">
+          <p>
+            This page works as the personal introduction area of the site and as
+            the second main destination from Home.
+          </p>
+          <p>
+            From here you can go back to the blog, check the available entry, and
+            keep a clear navigation flow between the three main areas of the site.
+          </p>
+          <div className="cta-row">
+            <NavLink className="cta-primary" navigate={navigate} page="blog">
+              View blog
+            </NavLink>
+            <NavLink className="cta-secondary" navigate={navigate} page="projects">
+              View projects
+            </NavLink>
+          </div>
+        </div>
+      </div>
+
+      <div className="about-cards">
+        <article className="feature-card compact-card detail-card">
+        <p className="feature-kicker">Ocado</p>
+        <h2>My contributions at Ocado</h2>
+        <p className="feature-text">{ocadoContributionSummary}</p>
+          <NavLink
+            className="text-link"
+            navigate={navigate}
+            page="ocado-contributions"
+          >
+            Read full details
+          </NavLink>
+        </article>
+
+        <article className="feature-card compact-card detail-card">
+        <p className="feature-kicker">Work Style</p>
+        <h2>Ownership, learning, collaboration</h2>
+          <p className="feature-text">
+            I usually contribute by spotting risks early, learning fast across
+            domains, documenting clearly, and making systems easier for others
+            to work with.
+          </p>
+        </article>
+      </div>
+
+      <section className="certifications-section">
+        <div className="section-heading">
+          <p className="feature-kicker">Certifications</p>
+          <h2>Learning and formal training</h2>
+          <p className="feature-text">
+            A visual overview of the certifications currently stored in the
+            project.
+          </p>
+        </div>
+
+        <div className="certifications-grid">
+          {certifications.map((certificate, index) => (
+            <article className="certificate-card" key={certificate}>
+              <img
+                alt={`Certification ${index + 1}`}
+                className="certificate-image"
+                src={certificate}
+              />
+            </article>
+          ))}
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function OcadoContributionsPage() {
+  return (
+    <section className="list-card">
+      <div className="section-heading">
+        <p className="feature-kicker">Ocado</p>
+        <h1>My contributions at Ocado</h1>
+        <p className="feature-text">{ocadoContributionSummary}</p>
+      </div>
+
+      <div className="contribution-sections">
+        {ocadoContributionSections.map((section) => (
+          <section className="contribution-card" key={section.title}>
+            <h2>{section.title}</h2>
+            <ul className="contribution-list">
+              {section.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ProjectsPage() {
+  return (
+    <section className="list-card">
+      <div className="section-heading">
+        <p className="feature-kicker">Projects</p>
+        <h1>Selected projects</h1>
+        <p className="feature-text">
+          Mocked project tiles for now. Later these can link to detailed pages or
+          case studies.
+        </p>
+      </div>
+
+      <div className="projects-grid">
+        {projects.map((project) => (
+          <article className="project-tile" key={project}>
+            <p className="post-category">Project</p>
+            <h2>{project}</h2>
+            <p className="feature-text">
+              Placeholder card ready to be replaced with the real project
+              content.
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function renderInlineContent(text) {
+  const parts = text.split(/(`[^`]+`|\[[^\]]+\]\([^)]+\))/g);
+
+  return parts.map((part, index) => {
+    if (!part) {
+      return null;
+    }
+
+    if (/^`[^`]+`$/.test(part)) {
+      return <code key={`${part}-${index}`}>{part.slice(1, -1)}</code>;
+    }
+
+    const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+
+    if (linkMatch) {
+      return (
+        <a href={linkMatch[2]} key={`${part}-${index}`} rel="noreferrer" target="_blank">
+          {linkMatch[1]}
+        </a>
+      );
+    }
+
+    return <React.Fragment key={`${part}-${index}`}>{part}</React.Fragment>;
+  });
+}
+
+function ArticleContent({ entry }) {
+  return (
+    <div className="content">
+      {entry.blocks.map((block, index) => {
+        if (block.type === "lead") {
+          return (
+            <p className="intro" key={`${block.type}-${index}`}>
+              {block.text}
+            </p>
+          );
+        }
+
+        if (block.type === "heading") {
+          if (block.level === 1) {
+            return <h2 key={`${block.type}-${index}`}>{block.text}</h2>;
+          }
+
+          if (block.level === 3) {
+            return <h3 key={`${block.type}-${index}`}>{block.text}</h3>;
+          }
+
+          return <h2 key={`${block.type}-${index}`}>{block.text}</h2>;
+        }
+
+        if (block.type === "quote") {
+          return <blockquote key={`${block.type}-${index}`}>{renderInlineContent(block.text)}</blockquote>;
+        }
+
+        if (block.type === "list") {
+          const ListTag = block.ordered ? "ol" : "ul";
+          return (
+            <ListTag className="article-list" key={`${block.type}-${index}`}>
+              {block.items.map((item) => (
+                <li key={item}>{renderInlineContent(item)}</li>
+              ))}
+            </ListTag>
+          );
+        }
+
+        if (block.type === "code") {
+          return (
+            <pre className="article-code" key={`${block.type}-${index}`}>
+              <code>{block.text}</code>
+            </pre>
+          );
+        }
+
+        if (block.type === "image") {
+          return <img alt={block.alt} className="article-image" key={`${block.type}-${index}`} src={block.src} />;
+        }
+
+        if (block.type === "note") {
+          return (
+            <div className="expiration-note" key={`${block.type}-${index}`}>
+              <span>{block.text}</span>
+            </div>
+          );
+        }
+
+        return (
+          <p key={`${block.type}-${index}`}>{renderInlineContent(block.text)}</p>
+        );
+      })}
+    </div>
+  );
+}
+
+function ArticlePage({ entry }) {
+  if (!entry) {
+    return (
+      <section className="list-card">
+        <div className="section-heading">
+          <p className="feature-kicker">Blog</p>
+          <h1>Article not found</h1>
+          <p className="feature-text">The requested blog entry could not be found.</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <article className="article-card">
+      <div className="article-inner">
+        <header className="article-header">
+          <div className="badge">{entry.category}</div>
+          <h1>{entry.headline}</h1>
+
+          <div className="meta-row">
+            <div className="author">
+              <div className="avatar-frame">
+                <img alt="Author" src="/avatar.jpg" />
+              </div>
+              <div className="author-copy">
+                <p className="author-name">{entry.author}</p>
+                <p className="author-role">{entry.role}</p>
               </div>
             </div>
-            <p>Copyright © 2026 - Todos los derechos reservados</p>
-          </aside>
-        </footer>
+
+            <div className="meta-list">
+              <span>
+                <Icon className="icon-sm primary-text">
+                  <path d="M8 2v4" />
+                  <path d="M16 2v4" />
+                  <rect height="18" rx="2" width="18" x="3" y="4" />
+                  <path d="M3 10h18" />
+                </Icon>
+                {entry.date}
+              </span>
+              <span>
+                <Icon className="icon-sm primary-text">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </Icon>
+                {entry.readTime}
+              </span>
+            </div>
+          </div>
+        </header>
+        <ArticleContent entry={entry} />
+      </div>
+    </article>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="footer">
+      <aside>
+        <div className="brand-block">
+          <div>
+            <p className="brand-name">Dani Voro</p>
+            <p>Software Developer</p>
+          </div>
+        </div>
+        <p>Copyright © 2026 - All rights reserved</p>
+      </aside>
+    </footer>
+  );
+}
+
+function App() {
+  const [theme, setTheme] = useState("dim");
+  const [uiStyle, setUiStyle] = useState("modern");
+  const [route, setRoute] = useState(() => getRouteFromHash());
+  const [showStickyHeader, setShowStickyHeader] = useState(false);
+  const [historyState, setHistoryState] = useState(() => ({
+    entries: [window.location.hash || "#inicio"],
+    index: 0
+  }));
+  const skipHashSyncRef = useRef(false);
+
+  useEffect(() => {
+    const onHashChange = () => {
+      if (skipHashSyncRef.current) {
+        skipHashSyncRef.current = false;
+        return;
+      }
+
+      const nextRoute = getRouteFromHash();
+      setRoute(nextRoute);
+      setHistoryState((current) => {
+        const nextHash = window.location.hash || "#inicio";
+
+        if (current.entries[current.index] === nextHash) {
+          return current;
+        }
+
+        const entries = current.entries.slice(0, current.index + 1);
+        entries.push(nextHash);
+        return {
+          entries,
+          index: entries.length - 1
+        };
+      });
+    };
+
+    window.addEventListener("hashchange", onHashChange);
+
+    if (!window.location.hash) {
+      window.location.hash = "#inicio";
+    }
+
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setShowStickyHeader(window.scrollY > 96);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const navigate = (page, mode = "push", slug) => {
+    const nextHash = getHashForPage(page, slug);
+    setRoute(getRouteFromHash(nextHash));
+
+    setHistoryState((current) => {
+      if (mode === "back") {
+        return { ...current, index: Math.max(0, current.index - 1) };
+      }
+
+      if (mode === "forward") {
+        return {
+          ...current,
+          index: Math.min(current.entries.length - 1, current.index + 1)
+        };
+      }
+
+      if (current.entries[current.index] === nextHash) {
+        return current;
+      }
+
+      const entries = current.entries.slice(0, current.index + 1);
+      entries.push(nextHash);
+      return {
+        entries,
+        index: entries.length - 1
+      };
+    });
+
+    skipHashSyncRef.current = true;
+    window.location.hash = nextHash;
+  };
+
+  let content = <HomePage navigate={navigate} />;
+
+  if (route.page === "blog") {
+    content = <BlogPage navigate={navigate} />;
+  } else if (route.page === "about") {
+    content = <AboutPage navigate={navigate} />;
+  } else if (route.page === "ocado-contributions") {
+    content = <OcadoContributionsPage />;
+  } else if (route.page === "projects") {
+    content = <ProjectsPage />;
+  } else if (route.page === "article") {
+    content = <ArticlePage entry={getArticleBySlug(route.slug)} />;
+  }
+
+  const canGoBack = historyState.index > 0;
+  const canGoForward = historyState.index < historyState.entries.length - 1;
+  const handleBack = () => {
+    if (!canGoBack) {
+      return;
+    }
+
+    const previousHash = historyState.entries[historyState.index - 1];
+    const previousRoute = getRouteFromHash(previousHash);
+    navigate(previousRoute.page, "back", previousRoute.slug);
+  };
+  const handleForward = () => {
+    if (!canGoForward) {
+      return;
+    }
+
+    const nextHash = historyState.entries[historyState.index + 1];
+    const nextRoute = getRouteFromHash(nextHash);
+    navigate(nextRoute.page, "forward", nextRoute.slug);
+  };
+
+  return (
+    <div className={`app theme-${theme} skin-${uiStyle}`}>
+      <main className="page">
+        <HeaderControls
+          canGoBack={canGoBack}
+          canGoForward={canGoForward}
+          navigate={navigate}
+          onBack={handleBack}
+          onForward={handleForward}
+          route={route}
+          scrolled={showStickyHeader}
+          setTheme={setTheme}
+          setUiStyle={setUiStyle}
+          theme={theme}
+          uiStyle={uiStyle}
+        />
+        {content}
+        <Footer />
       </main>
     </div>
   );
