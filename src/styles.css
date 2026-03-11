@@ -264,6 +264,7 @@ button {
 .settings-button {
   width: 2.25rem;
   height: 2.25rem;
+  flex: 0 0 2.25rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -272,10 +273,27 @@ button {
   background: var(--base-100);
   color: inherit;
   cursor: pointer;
+  transition:
+    width 0.18s ease,
+    opacity 0.18s ease,
+    margin 0.18s ease,
+    padding 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .settings-button.active {
   color: var(--primary);
+}
+
+.topbar-scrolled .terminal-trigger {
+  width: 0;
+  flex-basis: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .settings-menu {
@@ -337,13 +355,22 @@ button {
   background: color-mix(in srgb, var(--base-100) 94%, transparent);
   box-shadow: -18px 0 40px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(14px);
-  transform: translateX(102%);
-  transition: transform 0.22s ease;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(100%);
+  transition:
+    transform 0.22s ease,
+    opacity 0.18s ease,
+    visibility 0.18s ease;
   z-index: 60;
   overflow-y: auto;
 }
 
 .terminal-drawer.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
   transform: translateX(0);
 }
 
@@ -420,6 +447,20 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.compact-card {
+  min-height: 6.3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.compact-card .text-link {
+  margin-top: auto;
+}
+
+.compact-cta {
+  margin-top: auto;
 }
 
 .compact-card h2,
@@ -507,6 +548,25 @@ button {
   display: grid;
   gap: 0.8rem;
   margin-top: 1rem;
+  max-height: 30rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.blog-preview-list::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4.5rem;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    color-mix(in srgb, var(--base-100) 78%, transparent) 65%,
+    var(--base-100) 100%
+  );
+  pointer-events: none;
 }
 
 .blog-preview-card {
@@ -992,29 +1052,29 @@ button {
 }
 
 .skin-classic.theme-silk {
-  --base-100: #ece9d8;
-  --base-200: #d6d3c6;
-  --base-300: #3a6ea5;
-  --base-content: #1f1f1f;
+  --base-100: #f7f4e6;
+  --base-200: #e8e2cf;
+  --base-300: #4d7fba;
+  --base-content: #181818;
   --primary: #245edc;
   --primary-content: #ffffff;
   --border: #7f9db9;
   --badge: #d4461f;
   background:
-    linear-gradient(180deg, #7ba2e7 0%, #3a6ea5 100%);
+    linear-gradient(180deg, #92b5ef 0%, #4d7fba 100%);
 }
 
 .skin-classic.theme-dim {
-  --base-100: #c7d7f2;
-  --base-200: #aabede;
-  --base-300: #274a78;
-  --base-content: #111827;
+  --base-100: #b8c8e6;
+  --base-200: #95abd1;
+  --base-300: #18365a;
+  --base-content: #0d1422;
   --primary: #1f53c5;
   --primary-content: #ffffff;
-  --border: #5e7fa5;
+  --border: #4f6b8c;
   --badge: #b54429;
   background:
-    linear-gradient(180deg, #5d87c8 0%, #274a78 100%);
+    linear-gradient(180deg, #355d97 0%, #18365a 100%);
 }
 
 .skin-classic .feature-card,
@@ -1059,6 +1119,18 @@ button {
     inset -1px -1px 0 rgba(92, 101, 120, 0.45);
 }
 
+.skin-classic .theme-slider {
+  border-radius: 0.25rem;
+}
+
+.skin-classic .theme-slider-track {
+  width: 4rem;
+}
+
+.skin-classic .theme-thumb {
+  border-radius: 0.15rem;
+}
+
 .skin-classic .theme-thumb,
 .skin-classic .cta-primary {
   background: linear-gradient(180deg, #5b8ee8 0%, #2158d6 100%);
@@ -1079,6 +1151,10 @@ button {
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.9),
     inset -1px -1px 0 rgba(92, 101, 120, 0.45);
+}
+
+.skin-classic .blog-preview-list::after {
+  display: none;
 }
 
 .skin-classic .project-tile {
@@ -1133,7 +1209,7 @@ button {
   }
 
   .hero-feature {
-    grid-row: span 2;
+    grid-row: span 3;
   }
 
   .about-layout {

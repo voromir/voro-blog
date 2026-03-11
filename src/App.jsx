@@ -398,6 +398,10 @@ function getRouteFromHash(hashValue = window.location.hash) {
     return { page: "projects" };
   }
 
+  if (hash === "music") {
+    return { page: "music" };
+  }
+
   if (hash === "about/ocado-contributions") {
     return { page: "ocado-contributions" };
   }
@@ -424,6 +428,10 @@ function getHashForPage(page, slug) {
 
   if (page === "projects") {
     return "#projects";
+  }
+
+  if (page === "music") {
+    return "#music";
   }
 
   if (page === "ocado-contributions") {
@@ -489,6 +497,10 @@ function Breadcrumbs({ route, navigate }) {
 
   if (route.page === "projects") {
     items.push({ label: "Projects", page: "projects", icon: "wrench", current: true });
+  }
+
+  if (route.page === "music") {
+    items.push({ label: "Create some music!", page: "music", current: true });
   }
 
   return (
@@ -605,10 +617,20 @@ function ThemeControls({ theme, setTheme, uiStyle, setUiStyle }) {
       }
 
       setOpen(false);
+      setTerminalOpen(false);
     };
 
     window.addEventListener("pointerdown", onPointerDown);
     return () => window.removeEventListener("pointerdown", onPointerDown);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setTerminalOpen(false);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
@@ -662,7 +684,7 @@ function ThemeControls({ theme, setTheme, uiStyle, setUiStyle }) {
       <button
         aria-expanded={terminalOpen}
         aria-label="Open CV terminal instructions"
-        className={`settings-button ${terminalOpen ? "active" : ""}`}
+        className={`settings-button terminal-trigger ${terminalOpen ? "active" : ""}`}
         onClick={() => {
           setTerminalOpen((value) => !value);
           setOpen(false);
@@ -852,7 +874,7 @@ function HomePage({ navigate }) {
         </div>
         <div className="cta-row">
           <NavLink className="cta-primary" navigate={navigate} page="blog">
-            Go to blog
+            See all entries
           </NavLink>
           <NavLink className="cta-secondary" navigate={navigate} page="about">
             About me
@@ -867,7 +889,7 @@ function HomePage({ navigate }) {
           This section works as a quick access point to a short personal
           introduction inside the site.
         </p>
-        <NavLink className="text-link" navigate={navigate} page="about">
+        <NavLink className="cta-secondary compact-cta" navigate={navigate} page="about">
           Open profile
         </NavLink>
       </article>
@@ -879,8 +901,19 @@ function HomePage({ navigate }) {
           A selection of personal projects and experiments, organized on a
           separate page.
         </p>
-        <NavLink className="text-link" navigate={navigate} page="projects">
+        <NavLink className="cta-secondary compact-cta" navigate={navigate} page="projects">
           Open projects
+        </NavLink>
+      </article>
+
+      <article className="feature-card compact-card">
+        <p className="feature-kicker">Music</p>
+        <h2>Create some music!</h2>
+        <p className="feature-text">
+          A small playful corner for rhythm, experimentation, and future audio tools.
+        </p>
+        <NavLink className="cta-secondary compact-cta" navigate={navigate} page="music">
+          Open synth
         </NavLink>
       </article>
     </section>
@@ -1054,6 +1087,18 @@ function ProjectsPage() {
             </p>
           </article>
         ))}
+      </div>
+    </section>
+  );
+}
+
+function MusicPage() {
+  return (
+    <section className="list-card">
+      <div className="section-heading">
+        <p className="feature-kicker">Music</p>
+        <h1>Create some music!</h1>
+        <p className="feature-text">Use my online synth to create some rythm</p>
       </div>
     </section>
   );
@@ -1322,6 +1367,8 @@ function App() {
     content = <OcadoContributionsPage />;
   } else if (route.page === "projects") {
     content = <ProjectsPage />;
+  } else if (route.page === "music") {
+    content = <MusicPage />;
   } else if (route.page === "article") {
     content = <ArticlePage entry={getArticleBySlug(route.slug)} />;
   }
