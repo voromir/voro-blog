@@ -517,6 +517,26 @@ function getHashForPage(page, slug) {
   return "#inicio";
 }
 
+function getBrowserTint(uiStyle, theme) {
+  if (uiStyle === "classic" && theme === "silk") {
+    return "#e8e2cf";
+  }
+
+  if (uiStyle === "classic" && theme === "dim") {
+    return "#355d97";
+  }
+
+  if (theme === "silk") {
+    return "#e9e2dc";
+  }
+
+  return "#1d232a";
+}
+
+function getAppleStatusBarStyle(theme) {
+  return theme === "silk" ? "default" : "black-translucent";
+}
+
 function Icon({ children, className = "" }) {
   return (
     <svg
@@ -986,10 +1006,14 @@ function HomePage({ navigate }) {
       <article className="feature-card compact-card">
         <p className="feature-kicker">About Me</p>
         <h2>Introduction</h2>
-        <p className="feature-text">
-          This section works as a quick access point to a short personal
-          introduction inside the site.
-        </p>
+        <div className="compact-profile-row">
+          <div className="compact-profile-avatar">
+            <img alt="Dani Voro" src="/Voro-profile.png" />
+          </div>
+          <p className="feature-text compact-profile-text">
+            Quick access point to a short personal introduction inside the site.
+          </p>
+        </div>
         <NavLink className="cta-secondary compact-cta" navigate={navigate} page="about">
           Open profile
         </NavLink>
@@ -1425,7 +1449,7 @@ function Footer() {
 }
 
 function App() {
-  const [theme, setTheme] = useState("dim");
+  const [theme, setTheme] = useState(() => localStorage.getItem("voro-color-theme") || "dim");
   const [uiStyle, setUiStyle] = useState(() => localStorage.getItem("voro-ui-style") || "modern");
   const [showExperienceModal, setShowExperienceModal] = useState(
     () => !localStorage.getItem("voro-ui-style")
@@ -1485,6 +1509,29 @@ function App() {
   useEffect(() => {
     localStorage.setItem("voro-ui-style", uiStyle);
   }, [uiStyle]);
+
+  useEffect(() => {
+    localStorage.setItem("voro-color-theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const tint = getBrowserTint(uiStyle, theme);
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    const appleStatusBarMeta = document.querySelector(
+      'meta[name="apple-mobile-web-app-status-bar-style"]'
+    );
+
+    if (themeMeta) {
+      themeMeta.setAttribute("content", tint);
+    }
+
+    if (appleStatusBarMeta) {
+      appleStatusBarMeta.setAttribute("content", getAppleStatusBarStyle(theme));
+    }
+
+    document.documentElement.style.backgroundColor = tint;
+    document.body.style.backgroundColor = tint;
+  }, [theme, uiStyle]);
 
   const navigate = (page, mode = "push", slug) => {
     const nextHash = getHashForPage(page, slug);
