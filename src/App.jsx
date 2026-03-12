@@ -1106,6 +1106,16 @@ function AboutPage({ navigate }) {
             <NavLink className="cta-primary" navigate={navigate} page="blog">
               View blog
             </NavLink>
+            <a className="cta-secondary cta-with-icon download-cta" download href="/voro-cv.pdf">
+              <Icon className="icon-sm">
+                <path d="M12 3v11" />
+                <path d="m7 11 5 5 5-5" />
+                <path d="M5 21h14" />
+              </Icon>
+              <span>
+                Download CV
+              </span>
+            </a>
             <NavLink className="cta-secondary" navigate={navigate} page="projects">
               View projects
             </NavLink>
