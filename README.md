@@ -13,3 +13,9 @@ This is my personal landing page. 👨‍💻
 I built it with React because it is the framework I am most used to working with, and it lets me iterate quickly on UI, navigation, and content structure. ⚛️
 
 You can reuse this codebase as a starting point for your own personal site or side project. 🚀
+
+Or download my CV from the console:
+
+```bash
+curl https://voro.blog/cv.txt
+```

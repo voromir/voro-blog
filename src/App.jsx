@@ -1120,6 +1120,10 @@ function AboutPage({ navigate }) {
               View projects
             </NavLink>
           </div>
+          <p className="console-note">
+            <span>Or download my CV from the console:</span>
+            <code>curl https://voro.blog/cv.txt</code>
+          </p>
         </div>
       </div>
 
