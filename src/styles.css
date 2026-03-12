@@ -74,6 +74,42 @@ button {
   padding: 1rem;
 }
 
+.experience-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+}
+
+.experience-modal {
+  width: min(28rem, 100%);
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: var(--base-100);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.24);
+}
+
+.experience-modal h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.9rem;
+  line-height: 1.15;
+}
+
+.experience-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.experience-button {
+  min-width: 8rem;
+}
+
 .topbar,
 .landing-grid,
 .list-card,
@@ -718,11 +754,15 @@ button {
 
 .certifications-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 1rem;
 }
 
 .certificate-card {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 1rem;
+  align-items: start;
   padding: 0.9rem;
   border: 1px solid var(--border);
   border-radius: 1rem;
@@ -734,6 +774,36 @@ button {
   width: 100%;
   height: auto;
   border-radius: 0.5rem;
+}
+
+.certificate-copy {
+  display: grid;
+  gap: 0.45rem;
+  align-content: start;
+}
+
+.certificate-copy h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.certificate-copy p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.certificate-notes-layout {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+.certificate-notes-image-wrap {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 0.9rem;
+  background: color-mix(in srgb, var(--base-200) 60%, transparent);
 }
 
 .about-avatar {
@@ -1085,7 +1155,8 @@ button {
 .skin-classic .list-card,
 .skin-classic .article-card,
 .skin-classic .settings-menu,
-.skin-classic .terminal-command-block {
+.skin-classic .terminal-command-block,
+.skin-classic .experience-modal {
   border-radius: 0.35rem;
   border: 1px solid #7f9db9;
   box-shadow:
@@ -1100,6 +1171,7 @@ button {
 .skin-classic .settings-menu,
 .skin-classic .terminal-drawer,
 .skin-classic .terminal-command-block,
+.skin-classic .experience-modal,
 .skin-classic .history-button,
 .skin-classic .settings-button,
 .skin-classic .theme-slider {
@@ -1185,6 +1257,14 @@ button {
     inset -1px -1px 0 rgba(92, 101, 120, 0.45);
 }
 
+.skin-classic .certificate-notes-image-wrap {
+  border-radius: 0.3rem;
+  background: linear-gradient(180deg, #f6f4ea 0%, #dfdac8 100%);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.9),
+    inset -1px -1px 0 rgba(92, 101, 120, 0.45);
+}
+
 .skin-classic .badge {
   border-radius: 0.35rem;
 }
@@ -1225,7 +1305,11 @@ button {
   }
 
   .certifications-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+  }
+
+  .certificate-notes-layout {
+    grid-template-columns: 20rem 1fr;
   }
 
   .projects-grid {
@@ -1261,6 +1345,10 @@ button {
   }
 
   .certifications-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .certificate-card {
     grid-template-columns: 1fr;
   }
 

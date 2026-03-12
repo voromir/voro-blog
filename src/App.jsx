@@ -62,11 +62,71 @@ const projects = [
 ];
 
 const certifications = [
-  "/Certificates/cert1.png",
-  "/Certificates/cert2.png",
-  "/Certificates/cert3.png",
-  "/Certificates/cert4.png",
-  "/Certificates/cert5.png"
+  {
+    id: "java-programming",
+    image: "/Certificates/cert1.png",
+    title: "Java Programming",
+    teacher: "La Salle",
+    platform: "La Salle",
+    summary: "Core Java foundations, object-oriented programming, and backend-oriented problem solving.",
+    notes: [
+      "I reinforced Java syntax, classes, inheritance, interfaces, and structured backend-oriented thinking.",
+      "It gave me a stronger base to understand how services are organized and how to write maintainable logic.",
+      "This course supported my transition into broader backend contribution work later on."
+    ]
+  },
+  {
+    id: "cybersecurity-management",
+    image: "/Certificates/cert2.png",
+    title: "Cybersecurity Management",
+    teacher: "UPF and CISCO",
+    platform: "Universitat Pompeu Fabra",
+    summary: "Security fundamentals, operational thinking, and practical awareness of cyber risk and response.",
+    notes: [
+      "I improved my understanding of security management, risk analysis, and incident-oriented thinking.",
+      "It helped me reason more clearly about vulnerabilities, observability, and security posture.",
+      "That knowledge later influenced my work around Snyk fixes, logging, and safer frontend practices."
+    ]
+  },
+  {
+    id: "frontend-masters-path",
+    image: "/Certificates/cert3.png",
+    title: "Professional Frontend Path",
+    teacher: "Multiple instructors",
+    platform: "Frontend Masters",
+    summary: "Advanced frontend engineering across React, JavaScript, architecture, and performance topics.",
+    notes: [
+      "I deepened my frontend engineering foundations through a broad path of advanced specialized courses.",
+      "It improved my understanding of architecture, maintainability, performance, and better technical decisions.",
+      "A lot of the implementation quality I aim for in production work was shaped by this path."
+    ]
+  },
+  {
+    id: "advanced-react",
+    image: "/Certificates/cert4.png",
+    title: "Advanced React",
+    teacher: "Udemy instructors",
+    platform: "Udemy",
+    summary: "Advanced React composition, state design, patterns, and scalable UI thinking.",
+    notes: [
+      "I focused on deeper React concepts beyond day-to-day component building.",
+      "It helped me think better about state boundaries, composition patterns, and reusable abstractions.",
+      "That translated into cleaner component design and better long-term maintainability."
+    ]
+  },
+  {
+    id: "continuous-learning",
+    image: "/Certificates/cert5.png",
+    title: "Continuous Learning",
+    teacher: "Various instructors",
+    platform: "LinkedIn Learning",
+    summary: "Supplementary continuous training across tooling, frontend practice, and software development skills.",
+    notes: [
+      "These shorter focused courses helped me keep learning continuously between larger formal programs.",
+      "They were useful to reinforce practical topics quickly and apply improvements in day-to-day work.",
+      "This habit of constant learning supports the way I adapt to new tools and technologies."
+    ]
+  }
 ];
 
 const ocadoContributionSections = [
@@ -379,6 +439,10 @@ function getArticleBySlug(slug) {
   return blogEntries.find((entry) => entry.slug === slug) || null;
 }
 
+function getCertificationById(id) {
+  return certifications.find((certificate) => certificate.id === id) || null;
+}
+
 function getRouteFromHash(hashValue = window.location.hash) {
   const hash = hashValue.replace(/^#/, "");
 
@@ -396,6 +460,10 @@ function getRouteFromHash(hashValue = window.location.hash) {
 
   if (hash === "projects") {
     return { page: "projects" };
+  }
+
+  if (hash.startsWith("certifications/")) {
+    return { page: "certification", certificateId: decodeURIComponent(hash.slice(15)) };
   }
 
   if (hash === "music") {
@@ -428,6 +496,10 @@ function getHashForPage(page, slug) {
 
   if (page === "projects") {
     return "#projects";
+  }
+
+  if (page === "certification") {
+    return `#certifications/${slug}`;
   }
 
   if (page === "music") {
@@ -497,6 +569,11 @@ function Breadcrumbs({ route, navigate }) {
 
   if (route.page === "projects") {
     items.push({ label: "Projects", page: "projects", icon: "wrench", current: true });
+  }
+
+  if (route.page === "certification") {
+    items.push({ label: "About Me", page: "about", icon: "user", current: false });
+    items.push({ label: "Certification", page: "certification", current: true });
   }
 
   if (route.page === "music") {
@@ -735,6 +812,28 @@ function ThemeControls({ theme, setTheme, uiStyle, setUiStyle }) {
           you tell me which file should be treated as the official one.
         </p>
       </aside>
+    </div>
+  );
+}
+
+function ExperienceModal({ onSelect }) {
+  return (
+    <div className="experience-modal-backdrop">
+      <div className="experience-modal">
+        <p className="feature-kicker">Welcome</p>
+        <h2>Select your experience</h2>
+        <p className="feature-text">
+          Choose the visual style you want to use across the site.
+        </p>
+        <div className="experience-actions">
+          <button className="cta-secondary experience-button" onClick={() => onSelect("classic")} type="button">
+            Classic
+          </button>
+          <button className="cta-primary experience-button" onClick={() => onSelect("modern")} type="button">
+            Modern
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1026,17 +1125,70 @@ function AboutPage({ navigate }) {
         </div>
 
         <div className="certifications-grid">
-          {certifications.map((certificate, index) => (
-            <article className="certificate-card" key={certificate}>
+          {certifications.map((certificate) => (
+            <article className="certificate-card" key={certificate.id}>
               <img
-                alt={`Certification ${index + 1}`}
+                alt={certificate.title}
                 className="certificate-image"
-                src={certificate}
+                src={certificate.image}
               />
+              <div className="certificate-copy">
+                <h3>{certificate.title}</h3>
+                <p><strong>Teacher:</strong> {certificate.teacher}</p>
+                <p><strong>Platform:</strong> {certificate.platform}</p>
+                <p><strong>Summary:</strong> {certificate.summary}</p>
+                <NavLink
+                  className="cta-secondary compact-cta"
+                  navigate={navigate}
+                  page="certification"
+                  slug={certificate.id}
+                >
+                  See my notes
+                </NavLink>
+              </div>
             </article>
           ))}
         </div>
       </section>
+    </section>
+  );
+}
+
+function CertificationPage({ certificate }) {
+  if (!certificate) {
+    return (
+      <section className="list-card">
+        <div className="section-heading">
+          <p className="feature-kicker">Certifications</p>
+          <h1>Certificate not found</h1>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="list-card">
+      <div className="section-heading">
+        <p className="feature-kicker">Certifications</p>
+        <h1>{certificate.title}</h1>
+        <p className="feature-text">{certificate.summary}</p>
+      </div>
+
+      <div className="certificate-notes-layout">
+        <div className="certificate-notes-image-wrap">
+          <img alt={certificate.title} className="certificate-image" src={certificate.image} />
+        </div>
+        <div className="contribution-card">
+          <p><strong>Teacher:</strong> {certificate.teacher}</p>
+          <p><strong>Platform:</strong> {certificate.platform}</p>
+          <h2>What I learned</h2>
+          <ul className="contribution-list">
+            {certificate.notes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </section>
   );
 }
@@ -1274,7 +1426,10 @@ function Footer() {
 
 function App() {
   const [theme, setTheme] = useState("dim");
-  const [uiStyle, setUiStyle] = useState("modern");
+  const [uiStyle, setUiStyle] = useState(() => localStorage.getItem("voro-ui-style") || "modern");
+  const [showExperienceModal, setShowExperienceModal] = useState(
+    () => !localStorage.getItem("voro-ui-style")
+  );
   const [route, setRoute] = useState(() => getRouteFromHash());
   const [showStickyHeader, setShowStickyHeader] = useState(false);
   const [historyState, setHistoryState] = useState(() => ({
@@ -1327,6 +1482,10 @@ function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("voro-ui-style", uiStyle);
+  }, [uiStyle]);
+
   const navigate = (page, mode = "push", slug) => {
     const nextHash = getHashForPage(page, slug);
     setRoute(getRouteFromHash(nextHash));
@@ -1365,6 +1524,8 @@ function App() {
     content = <BlogPage navigate={navigate} />;
   } else if (route.page === "about") {
     content = <AboutPage navigate={navigate} />;
+  } else if (route.page === "certification") {
+    content = <CertificationPage certificate={getCertificationById(route.certificateId)} />;
   } else if (route.page === "ocado-contributions") {
     content = <OcadoContributionsPage />;
   } else if (route.page === "projects") {
@@ -1398,6 +1559,14 @@ function App() {
 
   return (
     <div className={`app theme-${theme} skin-${uiStyle}`}>
+      {showExperienceModal ? (
+        <ExperienceModal
+          onSelect={(style) => {
+            setUiStyle(style);
+            setShowExperienceModal(false);
+          }}
+        />
+      ) : null}
       <main className="page">
         <HeaderControls
           canGoBack={canGoBack}
