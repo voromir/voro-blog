@@ -937,7 +937,7 @@ function NavLink({ children, className, page, navigate, slug }) {
 }
 
 function HomePage({ navigate }) {
-  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [selectedFilter, setSelectedFilter] = useState("AI");
   const previewEntries = blogEntries
     .filter((entry) => entry.source === "markdown")
     .filter((entry) => !selectedFilter || entry.tags.some((tag) => tag.toUpperCase() === selectedFilter))
@@ -953,13 +953,6 @@ function HomePage({ navigate }) {
             Notes, interesting finds, and lessons learned during my engineering journey.
           </p>
           <div className="blog-preview-filters">
-            <button
-              className={!selectedFilter ? "active" : ""}
-              onClick={() => setSelectedFilter(null)}
-              type="button"
-            >
-              All
-            </button>
             {homeBlogFilters.map((filter) => (
               <button
                 className={selectedFilter === filter.tag ? "active" : ""}
@@ -970,6 +963,13 @@ function HomePage({ navigate }) {
                 {filter.label}
               </button>
             ))}
+            <button
+              className={!selectedFilter ? "active" : ""}
+              onClick={() => setSelectedFilter(null)}
+              type="button"
+            >
+              All
+            </button>
           </div>
           <div className="blog-preview-list">
             {previewEntries.length > 0 ? (
@@ -1021,7 +1021,7 @@ function HomePage({ navigate }) {
 
       <article className="feature-card compact-card">
         <p className="feature-kicker">Projects</p>
-        <h2>Projects</h2>
+        <h2>Cool projects</h2>
         <p className="feature-text">
           A selection of personal projects and experiments, organized on a
           separate page.
