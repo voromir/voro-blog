@@ -780,7 +780,7 @@ function ThemeControls({ theme, setTheme, uiStyle, setUiStyle }) {
       </div>
       <button
         aria-expanded={terminalOpen}
-        aria-label="Open CV terminal instructions"
+        aria-label="Open Reader's corner"
         className={`settings-button terminal-trigger ${terminalOpen ? "active" : ""}`}
         onClick={() => {
           setTerminalOpen((value) => !value);
@@ -789,19 +789,20 @@ function ThemeControls({ theme, setTheme, uiStyle, setUiStyle }) {
         type="button"
       >
         <Icon className="icon-sm">
-          <rect height="18" rx="2" width="18" x="3" y="3" />
-          <path d="m8 9 3 3-3 3" />
-          <path d="M13 15h3" />
+          <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v16H6.5A2.5 2.5 0 0 0 4 22z" />
+          <path d="M20 20H6.5A2.5 2.5 0 0 0 4 22" />
+          <path d="M12 8h4" />
+          <path d="M12 12h4" />
         </Icon>
       </button>
       <aside className={`terminal-drawer ${terminalOpen ? "open" : ""}`}>
         <div className="terminal-drawer-header">
           <div>
-            <p className="settings-title">Terminal CV</p>
-            <h2>Get my CV from the terminal</h2>
+            <p className="settings-title">Library</p>
+            <h2>Reader&apos;s corner</h2>
           </div>
           <button
-            aria-label="Close CV terminal instructions"
+            aria-label="Close Reader's corner"
             className="settings-button"
             onClick={() => setTerminalOpen(false)}
             type="button"
@@ -813,23 +814,22 @@ function ThemeControls({ theme, setTheme, uiStyle, setUiStyle }) {
           </button>
         </div>
         <p className="feature-text terminal-copy">
-          Use the terminal to jump straight to the CV files from this project.
+          A space for programming-book articles and reading notes.
         </p>
         <div className="terminal-command-block">
-          <p className="terminal-command-label">Open the workspace</p>
-          <code>cd /Users/dani.vorobiev/bees/voro-blog</code>
+          <p className="terminal-command-label">Clean Code</p>
+          <code>Empty for now</code>
         </div>
         <div className="terminal-command-block">
-          <p className="terminal-command-label">List likely CV assets</p>
-          <code>find . -iname '*cv*' -o -iname '*resume*'</code>
+          <p className="terminal-command-label">Refactoring</p>
+          <code>Empty for now</code>
         </div>
         <div className="terminal-command-block">
-          <p className="terminal-command-label">Open the public folder</p>
-          <code>ls /Users/dani.vorobiev/bees/voro-blog/public</code>
+          <p className="terminal-command-label">Designing Data-Intensive Applications</p>
+          <code>Empty for now</code>
         </div>
         <p className="terminal-hint">
-          If you want, I can also wire this panel to the real CV file path once
-          you tell me which file should be treated as the official one.
+          More reading notes and book breakdowns can be added here later.
         </p>
       </aside>
     </div>
@@ -1122,7 +1122,10 @@ function AboutPage({ navigate }) {
           </div>
           <p className="console-note">
             <span>Or download my CV from the console:</span>
-            <code>curl https://voro.blog/cv.txt</code>
+            <code className="typing-command">
+              <span className="typing-command-text">curl https://voro.blog/cv.txt</span>
+              <span aria-hidden="true" className="typing-cursor" />
+            </code>
           </p>
         </div>
       </div>
@@ -1175,14 +1178,23 @@ function AboutPage({ navigate }) {
                 <p><strong>Teacher:</strong> {certificate.teacher}</p>
                 <p><strong>Platform:</strong> {certificate.platform}</p>
                 <p><strong>Summary:</strong> {certificate.summary}</p>
-                <NavLink
-                  className="cta-secondary compact-cta"
-                  navigate={navigate}
-                  page="certification"
-                  slug={certificate.id}
-                >
-                  See my notes
-                </NavLink>
+                <div className="certificate-actions">
+                  <NavLink
+                    className="cta-secondary compact-cta"
+                    navigate={navigate}
+                    page="certification"
+                    slug={certificate.id}
+                  >
+                    See my notes
+                  </NavLink>
+                  <button className="cta-secondary compact-cta cta-with-icon" type="button">
+                    <span>Implementation</span>
+                    <Icon className="icon-sm">
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </Icon>
+                  </button>
+                </div>
               </div>
             </article>
           ))}
