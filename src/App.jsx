@@ -1103,10 +1103,7 @@ function AboutPage({ navigate }) {
             keep a clear navigation flow between the three main areas of the site.
           </p>
           <div className="cta-row">
-            <NavLink className="cta-primary" navigate={navigate} page="blog">
-              View blog
-            </NavLink>
-            <a className="cta-secondary cta-with-icon download-cta" download href="/voro-cv.pdf">
+            <a className="cta-primary cta-with-icon download-cta" download href="/voro-cv.pdf">
               <Icon className="icon-sm">
                 <path d="M12 3v11" />
                 <path d="m7 11 5 5 5-5" />
@@ -1116,9 +1113,24 @@ function AboutPage({ navigate }) {
                 Download CV
               </span>
             </a>
-            <NavLink className="cta-secondary" navigate={navigate} page="projects">
-              View projects
-            </NavLink>
+            <a
+              className="cta-secondary cta-with-icon"
+              href="https://www.linkedin.com/in/daniil-vorobiev/"
+              rel="noreferrer"
+              target="_blank"
+            >
+              <img alt="" aria-hidden="true" className="cta-logo" src="/linkedin-logo-transparent.png" />
+              <span>LinkedIn</span>
+            </a>
+            <a
+              className="cta-secondary cta-with-icon"
+              href="https://github.com/voromir"
+              rel="noreferrer"
+              target="_blank"
+            >
+              <img alt="" aria-hidden="true" className="cta-logo cta-logo-github" src="/github-logo-transparent.png" />
+              <span>GitHub</span>
+            </a>
           </div>
           <p className="console-note">
             <span>Or download my CV from the console:</span>
