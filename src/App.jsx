@@ -1,4 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
+import hljs from "highlight.js/lib/core";
+import bash from "highlight.js/lib/languages/bash";
+import css from "highlight.js/lib/languages/css";
+import javascript from "highlight.js/lib/languages/javascript";
+import xml from "highlight.js/lib/languages/xml";
+import gsap from "gsap";
+
+hljs.registerLanguage("js", javascript);
+hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("bash", bash);
+hljs.registerLanguage("sh", bash);
+hljs.registerLanguage("shell", bash);
+hljs.registerLanguage("html", xml);
+hljs.registerLanguage("xml", xml);
+hljs.registerLanguage("css", css);
 
 const markdownModules = import.meta.glob("../blog-articles/*.md", {
   eager: true,
@@ -368,6 +383,14 @@ function parseMarkdownBlocks(markdown) {
   }
 
   return blocks;
+}
+
+function highlightCodeBlock(text, language) {
+  if (language && hljs.getLanguage(language)) {
+    return hljs.highlight(text, { language }).value;
+  }
+
+  return hljs.highlightAuto(text).value;
 }
 
 function getMarkdownEntries() {
@@ -1388,7 +1411,10 @@ function ArticleContent({ entry }) {
         if (block.type === "code") {
           return (
             <pre className="article-code" key={`${block.type}-${index}`}>
-              <code>{block.text}</code>
+              <code
+                className={`hljs${block.language ? ` language-${block.language}` : ""}`}
+                dangerouslySetInnerHTML={{ __html: highlightCodeBlock(block.text, block.language) }}
+              />
             </pre>
           );
         }
